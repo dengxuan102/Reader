@@ -1,15 +1,40 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Ebook from '@/Ebook'
 
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
+  base: '/',
   routes: [
+    // {
+    //   path: '/',
+    //   redirect: '/ebook'
+    // },
+    // {
+    //   path: '/ebook',
+    //   component: Ebook
+    // }
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../pages/login.vue')
+    },
+    {
+      path: '/usercenter',
+      name: 'usercenter',
+      component: () => import('../pages/userCenter.vue')
+    },
+    {
+      path: '/course',
+      name: 'course',
+      component: () => import('../pages/course.vue')
+    },
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'index',
+      component: () => import('../pages/index.vue')
     }
   ]
 })
