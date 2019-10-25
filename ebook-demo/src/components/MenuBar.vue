@@ -3,10 +3,10 @@
     <transition name="slide-up">
       <div class="menu-wrapper" v-show="ifTitleAndMenuShow">
         <div class="icon-wrapper">
-          <span class="icon-menu icon" @click="showSetting(1)"></span>
+          <span class="icon-menu icon" @click="showSetting(3)"></span>
         </div>
         <div class="icon-wrapper">
-          <span class="icon-progress icon" @click="showSetting(1)"></span>
+          <span class="icon-progress icon" @click="showSetting(2)"></span>
         </div>
         <div class="icon-wrapper">
           <span class="icon-bright icon" @click="showSetting(1)"></span>
@@ -61,6 +61,27 @@
           </div>
         </div>
         <!-- 设置主题 end -->
+        <!-- 设置读书进度 -->
+        <div class="setting-progress" v-else-if="showTag==2">
+          <div class="progress-wrapper">
+            <input
+              type="range"
+              class="progress"
+              max="100"
+              min="0"
+              step="1"
+              :value="progress"
+              :disabled="!bookAvailable"
+              ref="progress"
+              @change="onProgressChange($event.target.value)"
+              @input="onProgressInput($event.target.value)"
+            />
+          </div>
+          <div class="text-wrapper">
+            <span>{{bookAvailable ? `${progress}%` : '加载中'}}</span>
+          </div>
+        </div>
+        <!-- 设置读书进度 end -->
       </div>
     </transition>
   </div>
@@ -71,7 +92,8 @@ export default {
   data() {
     return {
       isSettingShow: false,
-      showTag: 0
+      showTag: 0,
+      progress: 0
     };
   },
   props: {
@@ -82,9 +104,22 @@ export default {
     fontSizeList: Array,
     defaultFontSize: Number,
     themeList: Array,
-    defaultTheme: Number
+    defaultTheme: Number,
+    bookAvailable: {
+      type: Boolean,
+      default: false
+    }
   },
   methods: {
+    //拖动进度条时触发事件
+    onProgressInput(progress) {
+      this.progress = progress;
+      this.$refs.progress.style.backgroundSize = `${this.progress}% 100%`;
+    },
+    //进度条松开后触发事件，根据进度条数值跳转到指定位置
+    onProgressChange(progress) {
+      this.$emit("onProgressChange", progress);
+    },
     setTheme(index) {
       this.$emit("setTheme", index);
     },
@@ -224,6 +259,38 @@ export default {
             color: #333;
           }
           @include center;
+        }
+      }
+    }
+
+    .setting-progress {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      .progress-wrapper {
+        width: 100%;
+        height: 100%;
+        @include center;
+        padding: 0 px2rem(30);
+        box-sizing: border-box;
+        .progress {
+          width: 100%;
+          -webkit-appearance: none;
+          height: px2rem(2);
+          // background: -webkit-linear-gradient(#999, #999) no-repeat, #ddd;
+          background-size: 0 100%;
+          &:focus {
+            outline: none;
+          }
+          &::-webkit-slide-thumb {
+            -webkit-appearance: none;
+            height: px2rem(20);
+            width: px2rem(20);
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.15);
+            border: px2rem(1) solid #ddd;
+          }
         }
       }
     }
