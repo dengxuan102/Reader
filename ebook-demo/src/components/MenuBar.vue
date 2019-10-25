@@ -18,7 +18,7 @@
     </transition>
     <transition name="slide-up">
       <div class="setting-wrapper" v-show="
-      isSettingShow">
+      ifSettingShow">
         <!-- 设置字体 -->
         <div class="setting-font-size" v-if="showTag===0">
           <div class="preview" :style="{fontSize:fontSizeList[0].fontSize+ 'px'}">A</div>
@@ -84,16 +84,30 @@
         <!-- 设置读书进度 end -->
       </div>
     </transition>
+    <!-- 目录 -->
+    <content-view
+      :ifShowContent="ifShowContent"
+      v-show="ifShowContent"
+      :navigation="navigation"
+      :bookAvialable="bookAvailable"
+      @jumpTo="jumpTo"
+    ></content-view>
+    <transition name="fade">
+      <div class="content-mask" v-show="ifShowContent" @click="hideContent"></div>
+    </transition>
+    <!-- 目录 end -->
   </div>
 </template>
 
 <script>
+import ContentView from "@/components/Content";
 export default {
   data() {
     return {
-      isSettingShow: false,
+      ifSettingShow: false,
       showTag: 0,
-      progress: 0
+      progress: 0,
+      ifShowContent: false
     };
   },
   props: {
@@ -108,9 +122,19 @@ export default {
     bookAvailable: {
       type: Boolean,
       default: false
-    }
+    },
+    navigation: Object
+  },
+  components: {
+    ContentView
   },
   methods: {
+    hideContent() {
+      this.ifShowContent = false;
+    },
+    jumpTo(target) {
+      this.$emit("jumpTo", target);
+    },
     //拖动进度条时触发事件
     onProgressInput(progress) {
       this.progress = progress;
@@ -124,12 +148,17 @@ export default {
       this.$emit("setTheme", index);
     },
     showSetting(tag) {
-      this.isSettingShow = true;
       this.showTag = tag;
+      if (this.showTag === 3) {
+        this.ifSettingShow = false;
+        this.ifShowContent = true;
+      } else {
+        this.ifSettingShow = true;
+      }
     },
     hideSetting() {
-      this.isSettingShow = false;
-      // this.isSettingShow = !this.isSettingShow;
+      this.ifSettingShow = false;
+      // this.ifSettingShow = !this.ifSettingShow;
     },
     setFontSize(fontSize) {
       this.$emit("setFontSize", fontSize);
@@ -294,6 +323,16 @@ export default {
         }
       }
     }
+  }
+  .content-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 101;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background: rgba(51, 51, 51, 0.8);
   }
 }
 </style>
